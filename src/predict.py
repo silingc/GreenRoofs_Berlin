@@ -17,6 +17,11 @@ from src.unet import UNet
 from src.transforms import ConvertImageMode, ImageToTensor
 from src.colors import make_palette
 
+try:
+    import paths as paths
+except:
+    import src.paths as paths
+
 def predict(tiles_dir, mask_dir, tile_size, device, chkpt):
     # load device
     net = UNet(2).to(device)
@@ -63,7 +68,7 @@ def predict(tiles_dir, mask_dir, tile_size, device, chkpt):
     print("Prediction Done, saved masks to " + mask_dir)
 
 if __name__=="__main__":
-    config = toml.load('config/predict-config.toml')
+    config = toml.load(os.path.join(paths.PROJECT_DIR, 'config/predict-config.toml'))
     
     city_name = config["city_name"]
     target_type = config["target_type"]
@@ -77,12 +82,12 @@ if __name__=="__main__":
     if target_type == "Solar":
         checkpoint_path = config["checkpoint_path"]
         checkpoint_name = config["solar_checkpoint"]
-        chkpt = torch.load(os.path.join(checkpoint_path, checkpoint_name), map_location=device)
+        chkpt = torch.load(os.path.join(paths.PROJECT_DIR, checkpoint_path, checkpoint_name), map_location=device)
     
     elif target_type == "Green":
         checkpoint_path = config["checkpoint_path"]
         checkpoint_name = config["green_checkpoint"]
-        chkpt = torch.load(os.path.join(checkpoint_path, checkpoint_name), map_location=device)
+        chkpt = torch.load(os.path.join(paths.PROJECT_DIR, checkpoint_path, checkpoint_name), map_location=device)
 
     
     predict(tiles_dir, mask_dir, tile_size, device, chkpt)

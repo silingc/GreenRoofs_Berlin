@@ -9,6 +9,11 @@ import numpy as np
 from src.tiles import tiles_from_slippy_map
 from src.features.building import Roof_features
 
+try:
+    import paths as paths
+except:
+    import src.paths as paths
+    
 def mask_to_feature(mask_dir):
 
     handler = Roof_features()
@@ -74,7 +79,7 @@ if __name__=="__main__":
 
     city_name = args.city
     target_type = args.type
-    mask_dir = os.path.join("results", "03Masks", target_type, city_name)
+    mask_dir = os.path.join(paths.PROJECT_DIR, "results", "03Masks", target_type, city_name)
     
     intersection(target_type, city_name, mask_dir)
     
