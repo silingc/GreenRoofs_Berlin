@@ -16,7 +16,7 @@ parser.add_argument("city", help="City to be predicted, must be the same as the 
 parser.add_argument("type", help="Roof Typology, Green for Greenroof, Solar for PV Roof")
 args = parser.parse_args()
 
-config = toml.load('config/predict-config.toml')
+config = toml.load(os.path.join(paths.PROJECT_DIR, 'config/predict-config.toml'))
     
 city_name = args.city
 target_type = args.type
