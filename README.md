@@ -1,5 +1,5 @@
 This is a repo forked from the official repo of Roofpedia (an open registry of green roofs and solar roofs across the globe identified by Roofpedia through deep learning). 
-## This repo employs Roofpedia to identify green roofs in Berlin, matches the green roof patches to the building footprints, in order to conduct further analysis.
+## This repo employs Roofpedia to identify green roofs in Berlin and matches the green roof patches to the building footprints, in order to conduct further analysis.
 
 Below is the original readme from Roofpedia, which explains how it can be installed and used.
 
