@@ -40,4 +40,4 @@ elif target_type == "Green":
 
 predict(tiles_dir, mask_dir, tile_size, device, chkpt)
 
-intersection(target_type, city_name, mask_dir)
+#intersection(target_type, city_name, mask_dir)
