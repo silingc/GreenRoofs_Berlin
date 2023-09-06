@@ -13,7 +13,10 @@ try:
     import paths as paths
 except:
     import src.paths as paths
-    
+
+'''
+python predict_and_extract.py Berlin_2016_12627  Green              
+''' 
 def mask_to_feature(mask_dir):
 
     handler = Roof_features()

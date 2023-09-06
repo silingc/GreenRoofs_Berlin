@@ -1,4 +1,5 @@
 ''' 
+DOP images source: https://fbinter.stadt-berlin.de/fb/berlin/service_intern.jsp?id=a_luftbild2016_rgb@senstadt&type=FEED
 files needed: building footprint, green roof ground truth, green roof predicted by RP
 PRE-PROCESSING (QGIS): (1) unite layer crs (4326) (2) fix geometries (3) add ID for layers
 * ground truth (Gt) dissolved took longer to intersect -> not done
@@ -28,7 +29,8 @@ except:
 from src.extract import mask_to_feature
 import math
 
-target_type, city_name = 'Green', 'Berlin_2016_10623'
+plz =  12357 #12627 #10623
+target_type, city_name = 'Green', 'Berlin_2016_%s' % plz 
 mask_dir = os.path.join(paths.PROJECT_DIR, "results", "03Masks", target_type, city_name)
 features = mask_to_feature(mask_dir)
 
@@ -46,23 +48,23 @@ intersections.to_file(os.path.join(paths.PROJECT_DIR, 'results/04Results/' + cit
 bds_join = city.sjoin(prediction, how="left",op='intersects')
 bds_join = bds_join.drop_duplicates(subset=['geometry'])
 bds_join['gr_2016'] = [0 if math.isnan(x) else 1 for x in list(bds_join['index_right'])] 
-bds_join = bds_join.drop(columns=['index_right','checked'])
+bds_join = bds_join.drop(columns=['index_right'])
 bds_join
 bds_join.to_file(os.path.join(paths.PROJECT_DIR, 'results/04Results/' + city_name + '_' + target_type + '_city.shp'))
  
-gr_gt = gp.GeoDataFrame.from_file(os.path.join(paths.PROJECT_DIR, 'results/05Analysis/Berlin_Gründächer_DachteilflächenGebäude_2016_10623.shp')) # green roof ground truth from Senat (grs in 2016)
+gr_gt = gp.GeoDataFrame.from_file(os.path.join(paths.PROJECT_DIR, 'results/05Analysis/Berlin_Gründächer_DachteilflächenGebäude_2016_%s.shp' % plz)) # green roof ground truth from Senat (grs in 2016)
 gr_gt = gr_gt.to_crs(4326) # change crs to 4326
 gr_gt.crs 
 # intersect gt with bds. if inetersection area < 0.01 (green roof area on bd), cannot be taken as green roof (this can be a mismeasurement of gt)
 intersections = gp.sjoin(gr_gt, bds_join, how='inner', op='intersects')
 intersections = intersections.drop_duplicates(subset=['geometry'])
-intersections = intersections.dissolve('geb_id_lef')
+intersections = intersections.dissolve('bds16_id')
 intersections['area'] = intersections['geometry'].map(lambda p: p.area)
 intersections = intersections[intersections['area'] >= 5e-10]
 intersections = intersections[['geometry', 'gruen_kat', 'area', 'gt2016_id']]
 #intersections.to_file(os.path.join(paths.PROJECT_DIR, 'results/05Analysis/' + city_name + '_' + target_type + '_gt_dis.shp'))
 
-bds_join_gt= gp.sjoin(bds_join, intersections, how='left', op='contains')
+bds_join_gt= gp.sjoin(bds_join, intersections, how='left', op='intersects')
 bds_join_gt = bds_join_gt.drop_duplicates(subset=['geometry'])
 #bds_join_gt.to_file(os.path.join(paths.PROJECT_DIR, 'results/05Analysis/' + city_name + '_' + target_type + '_city_gt.shp'))
 bds_join_gt['gt_2016'] = [0 if math.isnan(x) else 1 for x in list(bds_join_gt['gt2016_id'])] 
@@ -122,7 +124,7 @@ def confusion_matrix(false_negative, false_positive, true_negative, true_positiv
     ## Ticket labels - List must be in alphabetical order
     ax.xaxis.set_ticklabels(['False','True'])
     ax.yaxis.set_ticklabels(['False', 'True'])
-    plt.savefig(os.path.join(path_prefix, 'confusion_matrix_%s.pdf'% model))
+    plt.savefig(os.path.join(paths.PROJECT_DIR, 'results/05Analysis/', 'confusion_matrix_%s.pdf'% model))
     plt.show()
     return
  
